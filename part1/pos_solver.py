@@ -14,26 +14,57 @@ import random
 import math
 import operator
 
-
-
 # We've set up a suggested code structure, but feel free to change it. Just
 # make sure your code still works with the label.py and pos_scorer.py code
 # that we've supplied.
 #
 class Solver:
     POS = ['noun', 'verb', 'adj', 'adv', 'adp', 'conj', 'det', 'num', 'pron', 'prt', 'x', '.']
-    # Calculate the log of the posterior self.probability of a given sentence
-    #  with a given part-of-speech labeling
-    def posterior(self, sentence, label):        
-        return sum(math.log(self.prob[i]) for i in range(len(label)))
-    
-    # Do the training!
-    #
-    def train(self, data):
+    prob = []
+
+    def __init__(self):
         self.Prior_probabilities = {}
         self.Transition_probabilities = {}
         self.denominator = {}
         self.Emission_probabilities = {}
+        self.prob_S = []
+        self.POS = ['noun', 'verb', 'adj', 'adv', 'adp', 'conj', 'det', 'num', 'pron', 'prt', 'x', '.']
+        self.prob_VE=[]
+        self.prob_MAP=[]
+        
+    # Calculate the log of the posterior self.probability of a given sentence
+    #  with a given part-of-speech labeling
+    def posterior(self, sentence, algo, label):
+        log_vals = 0
+        
+        if algo == "1. Simplified":
+            for i in range(len(label)):
+                # Use the list created for simplified algorithm
+                log_vals += math.log(self.prob_S[i])
+            return log_vals
+        
+        elif algo == "2. HMM VE":
+            for i in range(len(label)):
+                # Use the list created for VE algorithm
+                log_vals += math.log(self.prob_VE[i])
+            return log_vals
+        
+        elif algo == "3. HMM MAP":
+            for i in range(len(label)):
+                # Use the list created for MAP algorithm
+                log_vals += math.log(self.prob_MAP[i])
+            return log_vals
+        
+        elif algo == "0. Ground truth":
+            return 100
+    
+    # Do the training!
+    #
+    def train(self, data):
+##        self.Prior_probabilities = {}
+##        self.Transition_probabilities = {}
+##        self.denominator = {}
+##        self.Emission_probabilities = {}
         
         for sentence_with_pos in data:
             ## Calulates the Transition count
@@ -78,6 +109,7 @@ class Solver:
 
 
         #Check if the label is present in the dictionary if not add it and give the value of it as 1
+        #only for prior and transition.
         for key in self.POS:
             if key not in self.Prior_probabilities:
                 self.Prior_probabilities[key] = 1
@@ -104,11 +136,12 @@ class Solver:
             for tag in self.Transition_probabilities[key]:
                 self.Transition_probabilities[key][tag] = self.Transition_probabilities[key][tag] / float(self.denominator[key])
             
-
+        #For emission assigning the default value for labels not present in the dictionary as well as
+        #calculating the final probabilities.
         for word in self.Emission_probabilities:
             for tag in self.POS:
                 if tag not in self.Emission_probabilities[word]:
-                    self.Emission_probabilities[word][tag] = 1
+                    self.Emission_probabilities[word][tag] = 1   
             for word_tag in self.Emission_probabilities[word]:
                 self.Emission_probabilities[word][word_tag] = self.Emission_probabilities[word][word_tag] / float(self.denominator[word_tag])    
 
@@ -128,8 +161,7 @@ class Solver:
                     Simplified[word][word_tag] = self.Prior_probabilities[word_tag]
                         
             self.prob.append(max(Simplified[word].iteritems(), key=operator.itemgetter(1))[1])
-            prediction.append(max(Simplified[word].iteritems(), key=operator.itemgetter(1))[0])
-            #print self.prob[i]                                            
+            prediction.append(max(Simplified[word].iteritems(), key=operator.itemgetter(1))[0])                                          
         return prediction
 
     def hmm_ve(self, sentence):
