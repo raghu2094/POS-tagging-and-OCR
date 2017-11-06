@@ -164,8 +164,34 @@ class Solver:
             prediction.append(max(Simplified[word].iteritems(), key=operator.itemgetter(1))[0])                                          
         return prediction
 
+
     def hmm_ve(self, sentence):
-        return [ "noun" ] * len(sentence)
+
+            prediction = []
+            alpha = {}
+
+            for i, word in enumerate(sentence):
+                alpha_index = str(i)
+                alpha[alpha_index] = {}
+                for word_tag in self.POS:
+                    if alpha_index == "0":
+                        alpha[alpha_index][word_tag] = (self.Emission_probabilities[word][word_tag]) * (
+                            self.Prior_probabilities[word_tag])
+                    else:
+                        for k in self.POS:
+                            if word_tag in alpha[alpha_index]:
+                                alpha[alpha_index][word_tag] += alpha[str(i - 1)][k] * self.Transition_probabilities[k][
+                                    word_tag]
+                            else:
+                                alpha[alpha_index][word_tag] = alpha[str(i - 1)][k] * self.Transition_probabilities[k][
+                                    word_tag]
+
+                        alpha[alpha_index][word_tag] *= self.Emission_probabilities[word][word_tag]
+
+                self.prob.append(max(alpha[alpha_index].iteritems(), key=operator.itemgetter(1))[1])
+                prediction.append(max(alpha[alpha_index].iteritems(), key=operator.itemgetter(1))[0])
+                # print self.prob[i]
+            return prediction
 
     def hmm_viterbi(self, sentence):
         return [ "noun" ] * len(sentence)
