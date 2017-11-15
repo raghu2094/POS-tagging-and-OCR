@@ -1,13 +1,15 @@
 ###################################
 # CS B551 Fall 2017, Assignment #3
 #
-# Your names and user ids:
+# Your names and user ids: 
+# Raghottam Dilip Talwai, Satendra Ramesh Varma, Sagar Suresh Panchal
+# rtalwai-satvarma-spanchal
 #
 # (Based on skeleton code by D. Crandall)
 #
 #
 ####
-# Put your report here!!
+# Report is provided in a PDF file named: part1.pdf
 ####
 
 import random
@@ -30,7 +32,6 @@ class Solver:
     # Calculate the log of the posterior self.probability of a given sentence
     # with a given part-of-speech labeling
     def posterior(self, sentence, label):
-
         log_vals = 0
         for i in range(len(sentence)):
             log_vals += math.log(self.Emission_probabilities[sentence[i]][label[i]] * self.Prior_probabilities[label[i]])
@@ -81,7 +82,8 @@ class Solver:
                             self.Emission_probabilities[word][word_tag] += 1
                         else:
                             self.Emission_probabilities[word][word_tag] = 1
-
+                            
+        # Assigned a small value for all the tags in Prior and Transition probabilities
         for key in self.POS:
             if key not in self.Prior_probabilities:
                 self.Prior_probabilities[key] = 0.000001
