@@ -1,4 +1,3 @@
-#Report is provided in the pdf
 #!/usr/bin/python
 #
 # ./ocr.py : Perform optical character recognition, usage:
