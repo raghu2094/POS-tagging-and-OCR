@@ -57,7 +57,7 @@ for (s, gt) in test_data:
     for (algo, label) in zip(Algorithms, Algorithm_labels):
         outputs[label] = solver.solve( algo, s) 
 
-    posteriors = { o: solver.posterior( s, outputs[o] ) for o in outputs }
+    posteriors = { o: solver.posterior( s, outputs[o]) for o in outputs }
     
     Score.print_results(s, outputs, posteriors)
         
